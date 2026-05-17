@@ -16,8 +16,4 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
-  pages: {
-    signIn: '/admin/login',
-    error: '/admin/login',
-  },
 }
