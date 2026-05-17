@@ -1,8 +1,1 @@
-{
-  "crons": [
-    {
-      "path": "/api/fetch-feeds",
-      "schedule": "0 * * * *"
-    }
-  ]
-}
+{}
