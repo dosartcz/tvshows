@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
-import { fetchAllFeeds } from '@/lib/rss'
+import { syncRssSources } from '@/lib/rss'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
 
 export async function POST() {
   try {
-    const result = await fetchAllFeeds()
+    const result = await syncRssSources()
     return NextResponse.json(result)
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   try {
-    const result = await fetchAllFeeds()
+    const result = await syncRssSources()
     return NextResponse.json(result)
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })

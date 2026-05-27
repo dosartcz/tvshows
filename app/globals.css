@@ -2,17 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @layer base {
   :root {
     color-scheme: dark;
+  }
+
+  .light {
+    color-scheme: light;
   }
 
   body {
     @apply bg-gray-950 text-gray-100 antialiased;
   }
 
+  .light body {
+    @apply bg-gray-50 text-gray-900;
+  }
+
   * {
     @apply border-gray-800;
+  }
+
+  .light * {
+    @apply border-gray-200;
   }
 }
 
@@ -30,7 +52,11 @@
   }
 
   .btn-primary {
-    @apply btn bg-amber-500 hover:bg-amber-400 text-gray-950 focus:ring-amber-500;
+    @apply btn text-gray-950;
+    background-color: #fbbf24;
+  }
+  .btn-primary:hover {
+    background-color: #fde68a;
   }
 
   .btn-secondary {
@@ -43,7 +69,7 @@
 
   .input {
     @apply w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 placeholder-gray-500
-           focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent;
+           focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent;
   }
 
   .label {

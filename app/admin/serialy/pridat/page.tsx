@@ -35,7 +35,10 @@ export default function PridatSerialPage() {
       body: JSON.stringify({ tmdb_id }),
     })
     const data = await res.json()
-    if (data.id) router.push(`/admin/serialy/${data.id}`)
+    if (data.id) {
+      router.refresh()
+      router.push(`/admin/serialy/${data.id}`)
+    }
     setImporting(null)
   }
 

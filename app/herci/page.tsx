@@ -1,14 +1,24 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { dbAll } from '@/lib/db'
+import { dbAll, dbGet } from '@/lib/db'
+import Pagination from '@/components/Pagination'
+import PersonPlaceholder from '@/components/PersonPlaceholder'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Herci & tvůrci' }
 export const dynamic = 'force-dynamic'
 
+const PER_PAGE = 40
+
 export default async function HerciPage({ searchParams }: { searchParams: Record<string, string> }) {
+  const page = Math.max(1, Number(searchParams.page ?? 1))
   const q = searchParams.q ?? ''
   const sort = searchParams.sort ?? 'name'
+
+  let countSql = 'SELECT COUNT(DISTINCT p.id) as count FROM people p LEFT JOIN show_people sp ON p.id = sp.person_id'
+  if (q) countSql += ' WHERE p.name LIKE ?'
+  const countResult = await dbGet(countSql, q ? [`%${q}%`] : [])
+  const total = Number((countResult as any)?.count ?? 0)
 
   let sql = `SELECT p.*, COUNT(DISTINCT sp.show_id) as show_count
              FROM people p LEFT JOIN show_people sp ON p.id = sp.person_id`
@@ -17,6 +27,7 @@ export default async function HerciPage({ searchParams }: { searchParams: Record
   if (q) { sql += ' WHERE p.name LIKE ?'; args.push(`%${q}%`) }
   sql += ' GROUP BY p.id'
   sql += sort === 'shows' ? ' ORDER BY show_count DESC, p.name' : ' ORDER BY p.name'
+  sql += ` LIMIT ${PER_PAGE} OFFSET ${(page - 1) * PER_PAGE}`
 
   const people = await dbAll(sql, args)
 
@@ -35,20 +46,21 @@ export default async function HerciPage({ searchParams }: { searchParams: Record
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-4">
         {people.map((p: any) => (
           <Link key={p.id as number} href={`/herci/${p.slug}`} className="group flex flex-col items-center text-center gap-2">
-            <div className="relative w-full aspect-square rounded-full overflow-hidden bg-gray-800 border-2 border-gray-700 group-hover:border-amber-500 transition-colors">
+            <div className="relative w-full rounded-lg overflow-hidden bg-gray-800 border-2 border-gray-700 group-hover:border-accent transition-colors" style={{aspectRatio: '2/3'}}>
               {p.photo_url ? (
                 <Image src={p.photo_url as string} alt={p.name as string} fill className="object-cover object-top" sizes="120px" />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-gray-600">👤</div>
+                <PersonPlaceholder />
               )}
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-300 group-hover:text-amber-400 transition-colors line-clamp-2">{p.name as string}</p>
+              <p className="text-xs font-medium text-gray-300 group-hover:text-accent transition-colors line-clamp-2">{p.name as string}</p>
               <p className="text-xs text-gray-600">{p.show_count as number} seriálů</p>
             </div>
           </Link>
         ))}
       </div>
+      <Pagination page={page} total={total} perPage={PER_PAGE} searchParams={searchParams} />
     </div>
   )
 }

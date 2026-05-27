@@ -12,6 +12,7 @@ interface Show {
   status?: string | null
   network?: string | null
   country?: string | null
+  character_name?: string | null
 }
 
 export default function ShowCard({ show }: { show: Show }) {
@@ -41,24 +42,22 @@ export default function ShowCard({ show }: { show: Show }) {
             TV
           </div>
         )}
-        {show.country && (
-          <span className="absolute top-2 right-2 badge bg-gray-950/80 text-gray-300 text-[10px]">
-            {show.country}
-          </span>
-        )}
       </div>
       <div className="p-3 flex flex-col gap-1 flex-1">
-        <h3 className="font-semibold text-sm leading-tight line-clamp-2 text-gray-100 group-hover:text-amber-400 transition-colors">
+        <h3 className="font-semibold text-sm leading-tight line-clamp-2 text-gray-100 group-hover:text-accent transition-colors">
           {show.title}
         </h3>
         <div className="flex items-center justify-between mt-auto pt-1">
           <span className="text-xs text-gray-500">{years}</span>
           {show.rating_imdb && (
-            <span className="text-xs font-bold text-amber-400">
+            <span className="text-xs font-bold text-accent">
               ★ {show.rating_imdb.toFixed(1)}
             </span>
           )}
         </div>
+        {show.character_name && (
+          <p className="text-xs text-gray-400 italic line-clamp-1">{show.character_name}</p>
+        )}
       </div>
     </Link>
   )

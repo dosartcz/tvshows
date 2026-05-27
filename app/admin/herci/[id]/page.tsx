@@ -10,6 +10,8 @@ export default function EditPersonPage() {
   const [person, setPerson] = useState<any>(null)
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
+  const [translating, setTranslating] = useState(false)
+  const [syncing, setSyncing] = useState(false)
 
   useEffect(() => {
     fetch(`/api/admin/people`).then(r => r.json()).then((people: any[]) => {
@@ -26,12 +28,49 @@ export default function EditPersonPage() {
         bio: person.bio,
         bio_cs: person.bio_cs,
         photo_url: person.photo_url,
+        birth_date: person.birth_date,
+        death_date: person.death_date,
         nationality: person.nationality,
       }),
     })
     setSaving(false)
     setMsg(res.ok ? 'Uloženo!' : 'Chyba.')
     setTimeout(() => setMsg(''), 3000)
+  }
+
+  async function translateBio() {
+    if (!person.bio) return
+    setTranslating(true)
+    const res = await fetch('/api/admin/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: person.bio }),
+    })
+    const data = await res.json()
+    if (data.translated) setPerson({ ...person, bio_cs: data.translated })
+    setTranslating(false)
+  }
+
+  async function syncFromTmdb() {
+    setSyncing(true)
+    const res = await fetch(`/api/admin/people/${id}/sync`, { method: 'POST' })
+    const data = await res.json()
+    if (res.ok) {
+      setPerson((prev: any) => ({
+        ...prev,
+        bio: data.bio ?? prev.bio,
+        photo_url: data.photo_url ?? prev.photo_url,
+        birth_date: data.birth_date ?? prev.birth_date,
+        death_date: data.death_date ?? prev.death_date,
+        nationality: data.nationality ?? prev.nationality,
+      }))
+      setMsg('Synchronizováno z TMDb!')
+      setTimeout(() => setMsg(''), 3000)
+    } else {
+      setMsg(data.error ?? 'Chyba při synchronizaci.')
+      setTimeout(() => setMsg(''), 4000)
+    }
+    setSyncing(false)
   }
 
   async function deletePerson() {
@@ -60,6 +99,16 @@ export default function EditPersonPage() {
             <label className="label">Národnost / místo původu</label>
             <input value={person.nationality ?? ''} onChange={e => setPerson({ ...person, nationality: e.target.value })} className="input" />
           </div>
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label className="label">Datum narození</label>
+              <input type="date" value={person.birth_date ?? ''} onChange={e => setPerson({ ...person, birth_date: e.target.value })} className="input" />
+            </div>
+            <div className="flex-1">
+              <label className="label">Datum úmrtí</label>
+              <input type="date" value={person.death_date ?? ''} onChange={e => setPerson({ ...person, death_date: e.target.value || null })} className="input" />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -70,7 +119,16 @@ export default function EditPersonPage() {
             rows={5} className="input resize-none" />
         </div>
         <div>
-          <label className="label">Bio (CZ překlad)</label>
+          <div className="flex items-center justify-between mb-1">
+            <label className="label !mb-0">Bio (CZ překlad)</label>
+            <button
+              onClick={translateBio}
+              disabled={translating || !person.bio}
+              className="text-xs text-accent hover:text-accent-hover disabled:opacity-40 transition-colors"
+            >
+              {translating ? 'Překládám...' : '✦ Přeložit z EN'}
+            </button>
+          </div>
           <textarea value={person.bio_cs ?? ''} onChange={e => setPerson({ ...person, bio_cs: e.target.value })}
             rows={5} className="input resize-none" />
         </div>
@@ -79,6 +137,9 @@ export default function EditPersonPage() {
       <div className="flex items-center gap-3">
         <button onClick={save} disabled={saving} className="btn-primary">
           {saving ? 'Ukládám...' : 'Uložit'}
+        </button>
+        <button onClick={syncFromTmdb} disabled={syncing} className="btn-secondary">
+          {syncing ? 'Synchronizuji...' : '↻ Sync z TMDb'}
         </button>
         {msg && <span className="text-sm text-green-400">{msg}</span>}
         <button onClick={deletePerson} className="btn-danger ml-auto">Smazat</button>

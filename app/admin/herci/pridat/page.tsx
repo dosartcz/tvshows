@@ -27,7 +27,10 @@ export default function PridatHercePage() {
       body: JSON.stringify({ tmdb_id }),
     })
     const data = await res.json()
-    if (data.id) router.push(`/admin/herci/${data.id}`)
+    if (data.id) {
+      router.refresh()
+      router.push(`/admin/herci/${data.id}`)
+    }
     setImporting(null)
   }
 

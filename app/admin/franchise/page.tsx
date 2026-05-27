@@ -81,8 +81,8 @@ export default function AdminFranchisePage() {
                   <p className="font-medium text-gray-100">{f.name}</p>
                   {f.description && <p className="text-gray-500 text-sm">{f.description}</p>}
                 </div>
-                <button onClick={() => setEditing(f)} className="text-amber-400 hover:text-amber-300 text-xs">Upravit</button>
-                <button onClick={() => deleteFranchise(f.id)} className="text-red-500 hover:text-red-400 text-xs">Smazat</button>
+                <button onClick={() => setEditing(f)} className="text-accent hover:text-accent-hover text-xs">Upravit</button>
+                <button onClick={() => deleteFranchise(f.id)} className="text-accent-hover hover:text-accent text-xs">Smazat</button>
               </div>
             )}
           </div>

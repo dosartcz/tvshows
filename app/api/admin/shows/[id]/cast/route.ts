@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { dbAll, dbRun } from '@/lib/db'
+import { syncCast } from '@/lib/tmdb'
 
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
@@ -24,6 +25,26 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   await dbRun(
     `INSERT OR IGNORE INTO show_people (show_id, person_id, role, character_name) VALUES (?, ?, ?, ?)`,
     [params.id, person_id, role, character_name ?? null]
+  )
+  return NextResponse.json({ ok: true })
+}
+
+export async function PUT(_: Request, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  await syncCast(Number(params.id))
+  return NextResponse.json({ ok: true })
+}
+
+export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { person_id, role, character_name } = await req.json()
+  await dbRun(
+    `UPDATE show_people SET character_name = ?, character_name_locked = 1 WHERE show_id = ? AND person_id = ? AND role = ?`,
+    [character_name ?? null, params.id, person_id, role]
   )
   return NextResponse.json({ ok: true })
 }

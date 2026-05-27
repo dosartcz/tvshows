@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
-import Navbar from '@/components/Navbar'
+import AuthModal from '@/components/AuthModal'
+import ConditionalLayout from '@/components/ConditionalLayout'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,8 +17,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="cs" className="dark">
       <body className={inter.className}>
         <Providers>
-          <Navbar />
-          <main>{children}</main>
+          <AuthModal />
+          <ConditionalLayout>{children}</ConditionalLayout>
         </Providers>
       </body>
     </html>

@@ -8,7 +8,13 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
-  const fields = ['name', 'bio', 'bio_cs', 'photo_url', 'birth_date', 'nationality'].filter(f => f in body)
+
+  if (body.action === 'toggle_active') {
+    await dbRun('UPDATE people SET active = ? WHERE id = ?', [body.active ? 1 : 0, params.id])
+    return NextResponse.json({ ok: true })
+  }
+
+  const fields = ['name', 'bio', 'bio_cs', 'photo_url', 'birth_date', 'death_date', 'nationality'].filter(f => f in body)
   if (fields.length) {
     const sets = fields.map(f => `${f} = ?`).join(', ')
     await dbRun(`UPDATE people SET ${sets} WHERE id = ?`,

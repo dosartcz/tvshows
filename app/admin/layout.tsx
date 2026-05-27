@@ -8,7 +8,8 @@ const navItems = [
   { href: '/admin/serialy', label: 'Seriály' },
   { href: '/admin/herci', label: 'Herci' },
   { href: '/admin/franchise', label: 'Franchise' },
-  { href: '/admin/clanky', label: 'Články' },
+  { href: '/admin/clanky', label: 'Aktuality' },
+  { href: '/admin/rss', label: 'RSS zdroje' },
   { href: '/admin/nastaveni', label: 'Nastavení' },
 ]
 
@@ -21,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {/* Sidebar */}
       <aside className="w-56 bg-gray-900 border-r border-gray-800 flex flex-col">
         <div className="px-4 py-5 border-b border-gray-800">
-          <Link href="/" className="text-lg font-bold text-amber-400">TVShows.cz</Link>
+          <Link href="/" className="text-lg font-bold text-accent">TVShows.cz</Link>
           <p className="text-xs text-gray-500 mt-0.5">Admin</p>
         </div>
         <nav className="flex-1 px-2 py-4 space-y-1">
