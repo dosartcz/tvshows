@@ -2,8 +2,6 @@
 
 Databáze US a UK televizních seriálů s osobním sledováním epizod, statistikami a komunitními funkcemi.
 
-🌐 **[tvshows.vercel.app](https://tvshows.vercel.app)**
-
 ---
 
 ## Stack
